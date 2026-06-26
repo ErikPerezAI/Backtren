@@ -4,18 +4,16 @@ import bcrypt from "bcrypt";
 const SALT_ROUNDS = 10;
 
 export const createUserService = async ({
-  name,
+  nombre,
   email,
   password,
-  role,
+  rol,
 }) => {
-  // Verificar si el email ya existe
   const existingUser = await pool.query(
     `
     SELECT id
-    FROM users
+    FROM usuarios
     WHERE email = $1
-      AND deleted_at IS NULL
     `,
     [email]
   );
@@ -24,28 +22,29 @@ export const createUserService = async ({
     throw new Error("Email already registered");
   }
 
-  // Hash de la contraseña
-  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+  const passwordHash = await bcrypt.hash(
+    password,
+    SALT_ROUNDS
+  );
 
-  // Crear usuario
   const result = await pool.query(
     `
-    INSERT INTO users (
-      name,
+    INSERT INTO usuarios (
+      nombre,
       email,
       password_hash,
-      role
+      rol
     )
     VALUES ($1, $2, $3, $4)
     RETURNING
       id,
-      name,
+      nombre,
       email,
-      role,
+      rol,
       created_at,
       updated_at
     `,
-    [name, email, passwordHash, role]
+    [nombre, email, passwordHash, rol]
   );
 
   return result.rows[0];

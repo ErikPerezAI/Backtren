@@ -8,12 +8,13 @@ GET {{urlhealth}}
 ### Login
 
 ###
-POST {{urlUser}}/login
+POST {{urlUser}}
 Content-Type: application/json
 
 {
-  "email": "erik@gmail.com",
-  "password": "1234"
+
+    "nombre": "Erik",
+    "email": "erik@gmail.com",
+    "password": "1234",
+    "rol": "alumno"
 }
-###
-GET {{urlUser}}
