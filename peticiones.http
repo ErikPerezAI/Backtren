@@ -1,0 +1,19 @@
+@urlbase=http://localhost:3000
+@urlhealth={{urlbase}}/health
+@urlUser={{urlbase}}/users
+
+### Health Check
+GET {{urlhealth}}
+
+### Login
+
+###
+POST {{urlUser}}/login
+Content-Type: application/json
+
+{
+  "email": "erik@gmail.com",
+  "password": "1234"
+}
+###
+GET {{urlUser}}
