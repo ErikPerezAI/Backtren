@@ -1,20 +1,176 @@
-@urlbase=http://localhost:3000
-@urlhealth={{urlbase}}/health
-@urlUser={{urlbase}}/users
+### CONFIGURACIÓN DE VARIABLES
+@urlbase = http://localhost:3000
+@urlhealth = {{urlbase}}/health
+@urlUser = {{urlbase}}/users
+@urlSubjects = {{urlbase}}/subjects
+@urlEnrollments = {{urlbase}}/enrollments
 
-### Health Check
+# NOTA: Para probar los endpoints que requieren ID, por favor copia un UUID
+# generado al crear los usuarios o materias e insértalo en las variables de abajo:
+@profesorId = 8d3a8e9b-7e6d-4b8c-9a2f-1c3b4a5d6e7f
+@alumnoId = 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+@materiaId = f47ac10b-58cc-4372-a567-0e02b2c3d479
+
+
+# ==========================================
+# 0. HEALTH CHECK
+# ==========================================
+
+### Health Check del Servidor
 GET {{urlhealth}}
 
-### Login
 
-###
+# ==========================================
+# 1. CRUD DE USUARIOS (Para Nota 7)
+# ==========================================
+
+### Crear Usuario 1 (Profesor)
 POST {{urlUser}}
 Content-Type: application/json
 
 {
+    "nombre": "Profesor Jirafales",
+    "email": "jirafales@escuela.com",
+    "password": "password123",
+    "rol": "profesor"
+}
 
-    "nombre": "Erik",
-    "email": "erik@gmail.com",
-    "password": "1234",
+### Crear Usuario 2 (Alumno)
+POST {{urlUser}}
+Content-Type: application/json
+
+{
+    "nombre": "El Chavo del Ocho",
+    "email": "chavo@vecindad.com",
+    "password": "elchavito_pass",
     "rol": "alumno"
+}
+
+### Crear Usuario 3 (Alumno de Prueba para Eliminar)
+# @name crearUsuarioEliminar
+POST {{urlUser}}
+Content-Type: application/json
+
+{
+    "nombre": "Ñoño",
+    "email": "nono@barriga.com",
+    "password": "nono_password",
+    "rol": "alumno"
+}
+
+### Listar todos los usuarios
+GET {{urlUser}}
+
+### Obtener un usuario específico por su ID
+# (Reemplazar {{alumnoId}} por un ID real obtenido al listar o crear)
+GET {{urlUser}}/{{alumnoId}}
+
+### Modificar/Actualizar un usuario (Ejemplo: Cambiar nombre y contraseña)
+# (Reemplazar {{alumnoId}} por un ID real)
+PUT {{urlUser}}/{{alumnoId}}
+Content-Type: application/json
+
+{
+    "nombre": "Chavo Metalero",
+    "password": "nuevo_password_seguro"
+}
+
+### Eliminar un usuario específico
+# (Reemplazar {{alumnoId}} por el ID del usuario Ñoño para no romper las otras pruebas)
+DELETE {{urlUser}}/{{alumnoId}}
+
+
+# ==========================================
+# 2. CRUD DE MATERIAS (Para Nota 10)
+# ==========================================
+
+### Crear una Materia (Asociada a un Profesor)
+# (Reemplazar {{profesorId}} con el ID de un usuario profesor real)
+POST {{urlSubjects}}
+Content-Type: application/json
+
+{
+    "nombre": "Aritmética Básica",
+    "profesor_id": "{{profesorId}}"
+}
+
+### Crear una Segunda Materia
+# (Reemplazar {{profesorId}} con el ID de un usuario profesor real)
+POST {{urlSubjects}}
+Content-Type: application/json
+
+{
+    "nombre": "Historia Patria",
+    "profesor_id": "{{profesorId}}"
+}
+
+### Listar todas las materias (Solo las activas - soft-delete no aplicadas)
+GET {{urlSubjects}}
+
+### Obtener una materia específica por su ID
+# (Reemplazar {{materiaId}} con un ID de materia real)
+GET {{urlSubjects}}/{{materiaId}}
+
+### Modificar/Actualizar una materia (Ejemplo: Cambiar nombre)
+# (Reemplazar {{materiaId}} con un ID de materia real)
+PUT {{urlSubjects}}/{{materiaId}}
+Content-Type: application/json
+
+{
+    "nombre": "Álgebra Avanzada"
+}
+
+### Eliminar una materia (Soft-Delete: actualiza 'deleted_at')
+# (Reemplazar {{materiaId}} con un ID de materia real)
+DELETE {{urlSubjects}}/{{materiaId}}
+
+
+# ==========================================
+# 3. RELACIÓN "DICTAN" - Profesor dicta Materia (Para Nota 10)
+# ==========================================
+
+### Registrar/Cambiar qué profesor dicta qué materia
+# (Reemplazar {{materiaId}} y {{profesorId}} con valores reales)
+PUT {{urlSubjects}}/{{materiaId}}/teacher
+Content-Type: application/json
+
+{
+    "profesor_id": "{{profesorId}}"
+}
+
+### Consultar las materias asignadas a un profesor específico
+# (Reemplazar {{profesorId}} con el ID del profesor a consultar)
+GET {{urlUser}}/teachers/{{profesorId}}/subjects
+
+
+# ==========================================
+# 4. RELACIÓN "CURSAN" - Alumno cursa Materia (Para Nota 10)
+# ==========================================
+
+### Inscribir a un alumno en una materia
+# (Reemplazar {{alumnoId}} y {{materiaId}} con valores reales)
+POST {{urlEnrollments}}
+Content-Type: application/json
+
+{
+    "alumno_id": "{{alumnoId}}",
+    "materia_id": "{{materiaId}}"
+}
+
+### Consultar las materias que está cursando un alumno
+# (Reemplazar {{alumnoId}} con el ID del alumno a consultar)
+GET {{urlUser}}/students/{{alumnoId}}/subjects
+
+### Consultar todos los alumnos inscritos en una materia específica
+# (Reemplazar {{materiaId}} con el ID de la materia a consultar)
+GET {{urlEnrollments}}/subject/{{materiaId}}
+
+### Desinscribir a un alumno de una materia
+# (Reemplazar {{alumnoId}} y {{materiaId}} con valores reales)
+DELETE {{urlEnrollments}}
+Content-Type: application/json
+
+{
+    "alumno_id": "{{alumnoId}}",
+    "materia_id": "{{materiaId}}"
 }
