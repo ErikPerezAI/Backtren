@@ -18,4 +18,11 @@ app.use("/users", userRoutes);
 app.use("/subjects", subjectRoutes);
 app.use("/enrollments", enrollmentRoutes);
 
+app.get("/", (req, res) => {
+  return res.status(200).json({
+    status: "online",
+    message: "API de Backtren funcionando perfectamente",
+  });
+});
+
 export default app;
